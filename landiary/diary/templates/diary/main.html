@@ -1,0 +1,193 @@
+{% extends "diary/layout.html" %}
+{% load static %}
+{% block title %} MAIN {% endblock %}
+{% block script %}
+<script language="javascript">
+    // login 알림 메세지 2초뒤에 지우기
+    if (document.getElementsByClassName('message')){
+        setTimeout(() => {
+            var get_element = document.getElementById('message');
+            get_element.remove();
+        }, 2000);
+    }
+
+    var date = new Date();
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = today.getMonth();
+    var day = today.getDay();
+    month += 1;
+    function dayy(year, month){ //월의 일수를 구함
+        switch(month){
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+            return 31;
+
+            case 4: case 6: case 9: case 11:
+            return 30;
+
+            case 2:
+            if(((year%400)==0||(year%4)==0&&(year%100)!=0)){
+                return 29;
+            }
+            else{
+                return 28;
+            }
+        }   
+    }
+    function prevmonth(){ //이전 월로 가는 함수
+        var ymda = document.getElementById("prev");
+        var yg = document.getElementById("Ymd");
+        month--; //month를 계속 감소시켜준다
+        if(month < 1){ // month가 1보다 작아지면
+            month = 12; // month를 12로 만들어줌
+            year -= 1; //year를 1 감소시켜준다
+        }
+        if(year < 1970){
+            alert("기원전");
+             for(var i=1;i<100;i--){
+            window.top.moveTo(i ,i *=-1);
+            }
+        }
+        var ymda = year + "년" +" "+ (month)+"월";
+        present();
+    } 
+    function nextmonth(){  //다음 월로 가는 함수    
+        var ymda = document.getElementById("next");
+        var yg = document.getElementById("Ymd");
+        month++; //month 를 계속 증가시켜줌
+        if(month > 12){ //만약 month가 12를 넘어가면
+            month = 1; // month를 1로 만듦
+            year += 1; //year을 1 증가시켜준다
+        }
+        var ymda = year + "년" +" "+ month+"월";
+        present(); //present()함수를 호출하여 다시 찍어줌
+    }
+    function present(){
+        // var month_real = month - 1;
+        var start = new Date(year, month-1, 1);
+        var ymda = document.getElementById("Ymd");
+        var Tab = document.getElementById("tab");
+        var row = null;
+        var cnt = 0;
+        var row_count = 1;
+        var ym = year + "년" +" "+ (month)+"월";
+        ymda.innerHTML = ym;
+        while(tab.rows.length >2){     //테이블의 행의 길이가 2보다 크면 테이블의 행 제거함.
+            tab.deleteRow(tab.rows.length -1);
+        }
+        row = Tab.insertRow();
+        for(var j = 0; j<start.getDay(); j++){ //달력의 시작 일 구함
+            cell = row.insertCell();
+            cnt+=1;
+        }
+        for(var i = 1; i<= dayy(year, month); i++){ //달력 일수만큼 찍어줌
+            var cell = row.insertCell();
+            if(year == date.getFullYear() && month-1 == date.getMonth() && i == date.getDate()){
+                // for문으로 오늘 일기들에 대해 탐색 for post in today_posts
+                cell.innerHTML = "<div class='calendar_cell'>"+i+"</div>"+"{% for post in today_posts %}"+"<div>"+"<form name='myForm_{{post.id}}' method='GET' action='./calendardiary'>"+"<input type='hidden' name='post_id' value='{{post.id}}' />"+"</form>"+"<a class='calendar_a_tag_example' href='#' onclick = 'javascript:document.myForm_{{post.id}}.submit();'>"+"{{ post.title }}"+"</a>"+"</div>"+"{% endfor %}";
+            }
+            else {
+                {% if otherday_posts|length == 0 %}
+                    cell.innerHTML = "<div>"+i+"</div>"
+                {% else %}
+                    {% for post in otherday_posts %}
+                        if ({{ post.published|date:"Y" }} == year && {{post.published|date:"m"}} == month && {{post.published|date:"d"}} == i){
+                            if(cell.innerHTML!=""){
+                                cell.innerHTML += ("<div>"+"<form name='myForm_{{post.id}}' method='GET' action='./calendardiary'>"+"<input type='hidden' name='post_id' value='{{post.id}}' />"+"</form>"+"<a class='calendar_a_tag_example' href='#' onclick = 'javascript:document.myForm_{{post.id}}.submit();'>"+"{{ post.title }}"+"</a>"+"</div>");
+                            }
+                            else{
+                                if(i!=null) cell.innerHTML = "<div>"+i+"</div>"+("<div>"+"<form name='myForm_{{post.id}}' method='GET' action='./calendardiary'>"+"<input type='hidden' name='post_id' value='{{post.id}}' />"+"</form>"+"<a class='calendar_a_tag_example' href='#' onclick = 'javascript:document.myForm_{{post.id}}.submit();'>"+"{{ post.title }}"+"</a>"+"</div>");
+                            }
+                        }
+                        else{
+                            if (cell.innerHTML == ""){
+                                cell.innerHTML = cell.innerHTML+ "<div>"+i+"</div>";
+                            }else{
+
+                            }
+                        }
+                    {% endfor %}  
+                {% endif %}
+            }
+            
+            cnt += 1;
+            
+            if(cnt%7 ==0){ //cnt가 7이면 행을 늘려줌
+                row = tab.insertRow();
+                row_count += 1;
+            }
+            
+        }
+        for(var k = 0; k < row_count*7 - cnt; k++){
+            cell = row.insertCell();
+        }
+    }
+</script>
+<body class="main_footer_wrap">
+{% endblock %}
+                            {% block highlight %}
+                            <span class="new_write"><a href="./writediary">일기 쓰기</a></span>
+                            <span class="new_mydiary"><a href="./mydiary">내 일기장</a></span>
+                            <span class="new_pick"><a href="./pickdiary">뜯어온 일기장</a></span>
+                            <span class="new_exchange"><a href="./groupdiary/all">교환 일기장</a></span>
+                            <span class="new_setup"><a href="./setting">설정</a></span>
+                            <span class="new_logout"><a href="../logout">로그아웃</a></span>
+                            {% endblock %}
+        {% block main%}
+        <main>
+            <div class="main_wrap">
+                <span class="message">안녕하세요 {{ user }} 님!</span>
+                {% if message != null %}
+                    <div class="message" id="message">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                <div class="calendar">
+                    <table class = "main_calendar" id = "tab">
+                        <tr>
+                            <td class="calendar_prev" id="prev"><label class="calendar_label" onclick="prevmonth()"><</td>
+                            <td class="calendar_year_month" id="Ymd"colspan="5"></td>
+                            <td class="calendar_next" id="next"><label class="calendar_label" onclick="nextmonth()">></td>
+                        </tr>
+                        <tr class="calendar_weekday">
+                            <td class="week_sun">일</td>
+                            <td class="week_mon">월</td>
+                            <td class="week_tue">화</td>
+                            <td class="week_wed">수</td>
+                            <td class="week_thu">목</td>
+                            <td class="week_fri">금</td>
+                            <td class="week_sat">토</td> 
+                        </tr>
+                    </table>
+                    <script type="text/javascript">
+                        present();
+                    </script>
+                </div>
+            </div>
+        </main>
+        {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

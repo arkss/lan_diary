@@ -1,0 +1,67 @@
+
+{% load static %}
+<!doctype html>
+<html lang = "ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>LANDI LOGIN</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'login/css/login_style.css' %}">
+	<script>
+		if (document.getElementsByClassName('message')){
+			setTimeout(() => {
+				var get_element = document.getElementById('message');
+				get_element.remove();
+			}, 2000);
+		}
+	</script>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<div class="header_background_wrap">
+				<div class="new_header_wrap">
+					<div class="new_logo">LANDI</div>
+					<div class="blank_div"> </div>
+					<div>
+					<a href="https://kauth.kakao.com/oauth/authorize?client_id=1d894462dd40831cc8d2537ee51addfc&redirect_uri=http://localhost:8000/loging&response_type=code" class="login_nav">
+<!-- 						<a href="https://kauth.kakao.com/oauth/authorize?client_id=4b53473330b656e657284cfbee30f436&redirect_uri=http://ec2-13-209-26-90.ap-northeast-2.compute.amazonaws.com/loging&response_type=code" class="login_nav"> -->
+						<img src="{% static 'login/img/kakao_login.png' %}">
+					</a>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="main_footer_wrap">
+			<div class="main_wrap">
+				<div class="login_wrap">
+					<div class="login_background">      
+						<!-- 소개 내용 -->
+						{% if message != null %}
+							<div class="message" id="message">
+								{{ message }}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+				
+			</div>
+			<footer>
+				<div class="footer_wrap">
+					<div class="footer_icons clearfix">
+						<br><br><br><br><br><br><br><br>
+						<span class="footer_c">© 2018 LANDI</span>
+						<br><br><br>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</div>
+</body>
+
+
+
+
+
+
+
